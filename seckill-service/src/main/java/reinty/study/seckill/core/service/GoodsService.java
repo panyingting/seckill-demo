@@ -1,11 +1,13 @@
 package reinty.study.seckill.core.service;
 
+import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reinty.study.seckill.core.common.Const;
 import reinty.study.seckill.core.entity.GoodsEntity;
 import reinty.study.seckill.core.repository.GoodsRepository;
+import reinty.study.seckill.core.repository.PromotionActivityRepository;
 
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -16,6 +18,8 @@ public class GoodsService {
     @Autowired
     private GoodsRepository goodsRepository;
 
+    @Autowired
+    private RedisService redisService;
 
     public boolean isSaleOff(long goodsId){
         return EXPIRE_GOODS.get(goodsId) != null;
@@ -35,4 +39,23 @@ public class GoodsService {
     }
 
 
+    public GoodsEntity get(long id){
+        String key = getIdKey(id);
+        String entityJson = redisService.get(key);
+        if(entityJson == null){
+            GoodsEntity entity = goodsRepository.getOne(id);
+            String jsonStr = entity == null ? Const.CHACHE_NULL : JSON.toJSONString(entity);
+            redisService.set(key, jsonStr);
+            return entity;
+        }
+        if(entityJson.equals(Const.CHACHE_NULL)){
+            return null;
+        }
+        return JSON.parseObject(entityJson, GoodsEntity.class);
+    }
+
+
+    private String getIdKey(long id){
+        return "goods_"+id;
+    }
 }

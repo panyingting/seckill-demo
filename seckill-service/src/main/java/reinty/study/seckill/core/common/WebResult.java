@@ -55,7 +55,7 @@ public class WebResult<T> implements Serializable {
         return new WebResult(ResultEnum.SUCCESS);
     }
 
-    public static<T> WebResult sucessResult(T date) {
+    public static<T> WebResult<T> successResult(T date) {
         return new WebResult<>(ResultEnum.SUCCESS.code, null, date);
     }
 
