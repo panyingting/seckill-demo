@@ -1,0 +1,1 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=reinty.study.seckill.autoconfig.ConfigurationStarter
